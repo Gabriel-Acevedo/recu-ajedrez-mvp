@@ -10,11 +10,13 @@ public class PlayView extends SubView{
 	}
 	
 	public void interact(PlayController playController) {
+		playController.clearBoard();
 		playController.createBoard();
 		playController.showBoard();
 		Error error = null;
+		boolean isEndGame = false;
 		
-		while(true) {			
+		while(isEndGame == false) {			
 			Message.EMPTY_SPACE.writeln();
 			System.out.println(playController.getTurn() + " Piece Turn -- ");
 			int playerMovements[] = enterMovement();
@@ -26,6 +28,35 @@ public class PlayView extends SubView{
 					console.writeln("");
 				}else {
 					playController.movePieceOnBoard(playerMovements);
+					boolean isKingChecked = playController.isKingChecked();
+					if(isKingChecked == true) {
+						boolean isDefensePossible = playController.isDefensePossible(playerMovements);
+						if(isDefensePossible == false) {
+							boolean check_mate = playController.isGameFinished();
+							if(check_mate==true) {
+								Message.EMPTY_SPACE.writeln();
+								Message.CHECKMATE.writeln();
+								Message.EMPTY_SPACE.writeln();
+								playController.endGame();
+								isEndGame = true;
+							}else {
+								Message.EMPTY_SPACE.writeln();
+								Message.CHECK.writeln();
+								Message.EMPTY_SPACE.writeln();
+								playController.changeTurn();
+							} 
+						}else {
+							Message.EMPTY_SPACE.writeln();
+							Message.CHECK.writeln();
+							Message.EMPTY_SPACE.writeln();
+							playController.changeTurn();
+						}
+					}else {
+						Message.EMPTY_SPACE.writeln();
+						Message.MOVE_SUCCESFULL.writeln();
+						Message.EMPTY_SPACE.writeln();
+						playController.changeTurn();
+					}
 				}
 			}catch(NullPointerException e) {
 				Message.EMPTY_SPACE.writeln();

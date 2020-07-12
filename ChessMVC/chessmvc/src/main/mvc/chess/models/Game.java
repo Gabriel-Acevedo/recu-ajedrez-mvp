@@ -1,6 +1,5 @@
 package src.main.mvc.chess.models;
 
-import src.main.mvc.chess.views.Message;
 import src.main.mvc.utils.Console;
 
 public class Game{
@@ -17,16 +16,31 @@ public class Game{
 		board.createBoard();
 	}
 	
+	public void clearBoard() {
+		for(int i=0;i<8;i++) {	
+			for(int j=0;j<8;j++) {	
+			Piece piece = board.getPiecePosition()[i][j];		
+			if(piece != null) {
+					board.setPiecePosition(i, j, null);
+				}
+			}
+		}
+	}
+	
 	
 	public void showBoard() {
 		board.showBoard();
 	}
 	
 	
+	public void changeTurn() {
+		board.changeTurn();
+	}
+	
 	public Turn getTurn() {
 		return board.turn;
 	}
-		
+	
 	
 	public Error isMovePossible(int[] playerMovements) {
 		Piece piece = board.getPieceLocation(playerMovements[0], playerMovements[1]);
@@ -48,20 +62,9 @@ public class Game{
 		board.setPiecePosition(playerMovements[0], playerMovements[1], null);
 		board.changeTurn();
 		boolean isKingChecked = isKingChecked();
-		if(isKingChecked == true) {
-			isGameFinished();					
-		}else {
-			if(isKingChecked != true) {		
-				board.setPiecePosition(playerMovements[2], playerMovements[3], piece);
-				board.setPiecePosition(playerMovements[0], playerMovements[1], null);
-				Message.EMPTY_SPACE.writeln();
-				Message.MOVE_SUCCESFULL.writeln();
-				Message.EMPTY_SPACE.writeln();
-				board.changeTurn();
-						
-			}else {
-				Error.ONLY_KING_MOVE_IN_CHECK.writeln();
-			}
+		if(isKingChecked != true) {		
+			board.setPiecePosition(playerMovements[2], playerMovements[3], piece);
+			board.setPiecePosition(playerMovements[0], playerMovements[1], null);					
 		}
 	}
 	
@@ -105,6 +108,44 @@ public class Game{
 		return isKingChecked;
 	}
 	
+	public static boolean isDefensePossible(int[] playerMovements) {
+		boolean isDefensePossible = false;
+		Piece pieceAttacker = board.getPieceLocation(playerMovements[2],playerMovements[3]);
+		board.changeTurn();
+		for(int i=0;i<8;i++) {	
+			for(int j=0;j<8;j++) {	
+			Piece piece = board.getPiecePosition()[i][j];		
+				if(piece != null) {
+					if(piece.color == board.turn.getcolor()) {
+						if(piece.getClass() == King.class) {
+							isDefensePossible = piece.move_piece(i,j,playerMovements[2],playerMovements[3]);
+							if(isDefensePossible) {
+								board.setPiecePosition(playerMovements[2],playerMovements[3], piece);
+								if(isKingChecked() == false) {
+									board.setPiecePosition(i,j, piece);
+									board.setPiecePosition(playerMovements[2],playerMovements[3], pieceAttacker);
+									board.changeTurn();
+									return isDefensePossible;
+								}
+									board.setPiecePosition(i,j, piece);
+									board.setPiecePosition(playerMovements[2],playerMovements[3], pieceAttacker);
+							}							
+						}else {
+							isDefensePossible = piece.move_piece(i,j,playerMovements[2],playerMovements[3]);
+							if(isDefensePossible == true) {
+								board.changeTurn();
+								return isDefensePossible;
+							}
+						}
+					}
+				}
+			}
+		}
+		board.changeTurn();
+		return isDefensePossible;
+	}
+	
+	
 	public static boolean isCheckMate() {	
 		boolean isCheckMate;
 		isCheckMate = verifyCheckMate();
@@ -121,7 +162,7 @@ public class Game{
 		for(int i=0;i<8;i++) {	
 			for(int j=0;j<8;j++) {	
 			Piece piece = board.getPiecePosition()[i][j];		
-			if(piece != null) {
+			if(piece != null && piece.getClass() == King.class) {
 					for(int k = 0; k < 8; k++) {
 						for(int m = 0; m < 8; m++) {					
 							boolean  isMovePossible = false;
@@ -148,19 +189,9 @@ public class Game{
 	}		
 	
 	
-	private void isGameFinished() {
+	public boolean isGameFinished() {
 		boolean check_mate = isCheckMate();
-		if(check_mate==true) {
-			Message.EMPTY_SPACE.writeln();
-			Message.CHECKMATE.writeln();
-			Message.EMPTY_SPACE.writeln();
-			System.exit(0);
-		}else {
-			Message.EMPTY_SPACE.writeln();
-			Message.CHECK.writeln();
-			Message.EMPTY_SPACE.writeln();
-			board.changeTurn();
-		}
+		return check_mate;
 	}
 	
 		

@@ -10,11 +10,8 @@ public class ChessMVC {
 	private View view;
 
     private Logic logic;
-	
-	private Game game;
 		
 	private ChessMVC() {
-		this.game = new Game();
 		this.view = new View();
         this.logic = new Logic();
 	}
