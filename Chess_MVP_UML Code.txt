@@ -1,0 +1,157 @@
+@startuml
+
+
+title Chess MVP
+
+    package "src.main.mvc.utils"{
+        class Console{
+        }
+        class YesNoDialog{
+        }
+    }
+
+
+    package "src.main.mvc.chess"{
+        class ChessMVC{
+        }
+    }
+    
+
+    
+    
+    package "src.main.mvc.chess.controllers"{
+        abstract class Controller{
+        }
+        interface ControllersVisitor{
+        }
+        class Logic{
+        }
+        class StartController{
+        }
+        class PlayController{
+        }
+        class ResumeController{
+        }
+    }
+    
+    
+    package "src.main.mvc.chess.view"{
+        enum Message{
+        }
+        class View{
+        }
+        class StartView{
+        }
+        class PlayView{
+        }
+        class ResumeView{
+        }
+        class SubView{
+        }
+    }
+    
+
+    package "src.main.dm.chess.models"{
+    
+        class State{
+        }
+        
+        enum StateValue{
+        }
+        
+        enum Error{
+        }
+    
+        class Game {
+        }
+        
+        class Board{
+        }
+        
+        class Turn{
+        }
+        
+        abstract class Piece{
+        }
+        
+        class King{
+        }
+        class Queen{
+        }
+        class Bishop{
+        }
+        class Knight{
+        }
+        class Rook{
+        }
+        class Pawn{
+        }
+        
+        enum Color{
+        } 
+        
+        enum PieceTypes{
+        }
+        
+        enum PieceSymbol{
+        }
+        
+        
+    
+    }
+    
+   
+ChessMVC <-up-* Game
+ChessMVC <-up-* Logic
+Logic *-left-> State
+StateValue <-down-* State
+
+Game *-left-> Board
+Error <.. Game
+
+Board *-down-> Turn
+Turn *-up-> Color
+Game *-down-> Color
+Board <-up-* Piece
+Piece *-left-> PieceSymbol
+Piece *-left-> PieceTypes
+Piece *-up-> Color
+
+Piece <|-down- King
+Piece <|-down- Queen
+Piece <|-down- Bishop
+Piece <|-down- Knight
+Piece <|-down- Rook
+Piece <|-down- Pawn
+
+View <.. ControllersVisitor
+ControllersVisitor <.. Controller
+
+Logic *-down-> StartController
+Logic *-down-> PlayController
+Logic *-down-> ResumeController
+
+Controller <|-left- StartController
+Controller <|-left- PlayController
+Controller <|-left- ResumeController
+
+
+View <-up-* StartView 
+View <-up-* PlayView
+View <-up-* ResumeView
+View <-up-* ResumeView
+SubView <.. PlayView
+SubView <.. ResumeView
+YesNoDialog <.. ResumeView
+
+Message <-- StartView 
+Message <-- PlayView
+Message <-- ResumeView
+
+
+
+Game ..> Console
+
+@enduml
+
+@enduml
